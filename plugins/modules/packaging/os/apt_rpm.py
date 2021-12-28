@@ -47,6 +47,11 @@ EXAMPLES = '''
     pkg: foo
     state: present
 
+- name: Install package foo (exact version)
+  community.general.apt_rpm:
+    pkg: foo=1.2.3-4
+    state: present
+
 - name: Install packages foo and bar
   community.general.apt_rpm:
     pkg:
@@ -57,6 +62,11 @@ EXAMPLES = '''
 - name: Remove package foo
   community.general.apt_rpm:
     pkg: foo
+    state: absent
+
+- name: Remove package foo
+  community.general.apt_rpm:
+    pkg: foo=1.2.3-4
     state: absent
 
 - name: Remove packages foo and bar
@@ -86,6 +96,7 @@ RPM_PATH = "/usr/bin/rpm"
 def query_package(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
+    name = name.split("=")[0]
     rc, out, err = module.run_command("%s -q %s" % (RPM_PATH, name))
     if rc == 0:
         return True
@@ -96,6 +107,7 @@ def query_package(module, name):
 def query_package_provides(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
+    name = name.split("=")[0]
     rc, out, err = module.run_command("%s -q --provides %s" % (RPM_PATH, name))
     return rc == 0
 
